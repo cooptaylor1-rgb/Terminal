@@ -9,12 +9,14 @@ ARG QT_VERSION=6.7.2
 ARG QT_ARCH=gcc_64
 ARG QT_AQT_ARCH=linux_gcc_64
 
-# Build toolchain + Qt runtime system deps (for Qt to link against)
+# Build toolchain + Qt runtime system deps (for Qt to link against).
+# Debian 12's apt ships CMake 3.25, but this repo requires 3.27+ for presets.
 RUN apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates curl git \
-        cmake ninja-build g++-12 \
+        ninja-build g++-12 \
         python3 python3-pip python3-venv \
         pkg-config \
+        libglib2.0-0 \
         libgl1-mesa-dev libglu1-mesa-dev \
         libxkbcommon-dev libxkbcommon-x11-dev \
         libxcb1-dev libxcb-cursor-dev libxcb-icccm4-dev libxcb-image0-dev \
@@ -30,7 +32,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # aqtinstall pulls exact Qt binaries from the official Qt mirror. Strict pin —
 # matches find_package(Qt6 6.7.2 EXACT ...) in CMakeLists.txt.
 ENV QT_ROOT=/opt/Qt
-RUN pip3 install --break-system-packages --no-cache-dir aqtinstall \
+RUN pip3 install --break-system-packages --no-cache-dir cmake==3.27.7 aqtinstall \
     && python3 -m aqt install-qt linux desktop ${QT_VERSION} ${QT_AQT_ARCH} \
         --outputdir ${QT_ROOT} \
         --modules qtcharts qtwebsockets qtmultimedia qtspeech
