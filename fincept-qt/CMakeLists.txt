@@ -21,7 +21,7 @@ endif()
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 12.3)
     message(FATAL_ERROR
         "GCC 12.3 or newer required. Detected: ${CMAKE_CXX_COMPILER_VERSION}\n"
-        "Ubuntu 22.04+ / Debian 12+ ship a compatible GCC.")
+        "Use Ubuntu 24.04+ or another toolchain with GCC 12.3+; Debian 12 ships GCC 12.2.")
 endif()
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 15.0)
     message(FATAL_ERROR

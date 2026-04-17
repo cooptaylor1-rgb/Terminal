@@ -1,8 +1,9 @@
 # ── Stage 1: Build ────────────────────────────────────────────────────────────
-# Debian 12 base: ships a recent glibc (2.36) and g++-12 meeting our GCC 12.3+ pin.
-# Qt is NOT installed from apt (Debian ships 6.4.x); we fetch Qt 6.7.2 via
+# Ubuntu 24.04 base: ships glibc 2.39 and GCC 13, satisfying the repo's
+# GCC 12.3+ minimum. Qt is NOT installed from apt (Ubuntu ships an older 6.x);
+# we fetch Qt 6.7.2 via
 # aqtinstall to match the version pin in fincept-qt/CMakeLists.txt.
-FROM debian:12-slim AS builder
+FROM ubuntu:24.04 AS builder
 
 ENV DEBIAN_FRONTEND=noninteractive
 ARG QT_VERSION=6.7.2
@@ -10,10 +11,10 @@ ARG QT_ARCH=gcc_64
 ARG QT_AQT_ARCH=linux_gcc_64
 
 # Build toolchain + Qt runtime system deps (for Qt to link against).
-# Debian 12's apt ships CMake 3.25, but this repo requires 3.27+ for presets.
+# CMake still comes from pip because the repo requires 3.27+ for presets.
 RUN apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates curl git \
-        ninja-build g++-12 \
+    ninja-build gcc g++ \
         python3 python3-pip python3-venv \
         pkg-config \
         libglib2.0-0 \
@@ -24,8 +25,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libxcb-shape0-dev libxcb-sync-dev libxcb-xfixes0-dev \
         libxcb-xinerama0-dev libxcb-xkb-dev libxcb-util-dev \
         libfontconfig1-dev libdbus-1-dev libssl-dev \
-    && update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-12 60 \
-    && update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 60 \
     && rm -rf /var/lib/apt/lists/*
 
 # ── Install pinned Qt ${QT_VERSION} via aqtinstall ────────────────────────────
@@ -52,8 +51,8 @@ RUN rm -rf build \
 
 # ── Stage 2: Runtime ──────────────────────────────────────────────────────────
 # Minimal runtime: bundles Qt 6.7.2 libs copied from the builder stage so the
-# runtime image doesn't depend on Debian's (older) Qt packages.
-FROM debian:12-slim AS runtime
+# runtime image doesn't depend on Ubuntu's older Qt packages.
+FROM ubuntu:24.04 AS runtime
 
 ENV DEBIAN_FRONTEND=noninteractive
 ARG QT_VERSION=6.7.2
