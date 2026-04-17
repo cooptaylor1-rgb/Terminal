@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         python3 python3-pip python3-venv \
         pkg-config \
         libglib2.0-0 \
+        libpulse-dev \
         libgl1-mesa-dev libglu1-mesa-dev \
         libxkbcommon-dev libxkbcommon-x11-dev \
         libxcb1-dev libxcb-cursor-dev libxcb-icccm4-dev libxcb-image0-dev \
@@ -61,6 +62,7 @@ ARG QT_ARCH=gcc_64
 RUN apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates \
         python3 python3-pip \
+    libpulse0 \
         libgl1 libglu1-mesa libglib2.0-0 libdbus-1-3 libfontconfig1 \
         libxcb1 libxcb-cursor0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 \
         libxcb-randr0 libxcb-render-util0 libxcb-shape0 libxcb-sync1 \
