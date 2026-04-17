@@ -124,7 +124,7 @@ else
     [ -n "$AQT" ] || fail "aqtinstall did not install correctly."
     # Qt host/target/arch
     if [ "$PLATFORM" = "linux" ]; then
-        AQT_HOST="linux"   ; AQT_TARGET="desktop" ; AQT_ARCH="gcc_64"
+        AQT_HOST="linux"   ; AQT_TARGET="desktop" ; AQT_ARCH="linux_gcc_64"
     else
         AQT_HOST="mac"     ; AQT_TARGET="desktop" ; AQT_ARCH="clang_64"
     fi

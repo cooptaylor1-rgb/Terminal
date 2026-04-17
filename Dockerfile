@@ -7,6 +7,7 @@ FROM debian:12-slim AS builder
 ENV DEBIAN_FRONTEND=noninteractive
 ARG QT_VERSION=6.7.2
 ARG QT_ARCH=gcc_64
+ARG QT_AQT_ARCH=linux_gcc_64
 
 # Build toolchain + Qt runtime system deps (for Qt to link against)
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -30,7 +31,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # matches find_package(Qt6 6.7.2 EXACT ...) in CMakeLists.txt.
 ENV QT_ROOT=/opt/Qt
 RUN pip3 install --break-system-packages --no-cache-dir aqtinstall \
-    && python3 -m aqt install-qt linux desktop ${QT_VERSION} ${QT_ARCH} \
+    && python3 -m aqt install-qt linux desktop ${QT_VERSION} ${QT_AQT_ARCH} \
         --outputdir ${QT_ROOT} \
         --modules qtcharts qtwebsockets qtmultimedia qtspeech
 
