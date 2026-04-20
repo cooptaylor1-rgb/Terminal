@@ -68,10 +68,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libxcb-randr0 libxcb-render-util0 libxcb-shape0 libxcb-sync1 \
         libxcb-xfixes0 libxcb-xinerama0 libxcb-xkb1 libxcb-util1 \
         libxkbcommon0 libxkbcommon-x11-0 \
+    && pip3 install --break-system-packages --no-cache-dir \
+        'mcp[cli]' \
+        yfinance \
+        requests \
+        pandas \
+        numpy \
     && rm -rf /var/lib/apt/lists/*
 
 ENV QT_ROOT=/opt/Qt
 ENV QT_PREFIX="${QT_ROOT}/${QT_VERSION}/${QT_ARCH}"
+ENV FINCEPT_MCP_HOST=0.0.0.0
+ENV FINCEPT_MCP_PORT=18765
 
 # Bundle Qt 6.7.2 libs + plugins from builder stage
 COPY --from=builder ${QT_PREFIX}/lib       ${QT_PREFIX}/lib
@@ -86,7 +94,10 @@ WORKDIR /app
 COPY --from=builder /src/build/linux-release/FinceptTerminal ./FinceptTerminal
 COPY --from=builder /src/build/linux-release/_deps/qgeoview-build/lib/libqgeoview.so ./libqgeoview.so
 COPY --from=builder /src/scripts ./scripts
+COPY fincept-qt/packaging/linux/container-entrypoint.sh ./container-entrypoint.sh
 
-RUN chmod +x ./FinceptTerminal
+RUN chmod +x ./FinceptTerminal ./container-entrypoint.sh
 
-ENTRYPOINT ["./FinceptTerminal"]
+EXPOSE 18765
+
+ENTRYPOINT ["./container-entrypoint.sh"]
