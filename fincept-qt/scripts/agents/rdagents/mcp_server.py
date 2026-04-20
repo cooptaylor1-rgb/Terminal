@@ -89,6 +89,21 @@ def build_mcp_server(host: str = "127.0.0.1", port: int = 18765) -> Any:
         **init_kwargs,
     )
 
+    if hasattr(mcp, "custom_route"):
+        from starlette.responses import JSONResponse
+
+        @mcp.custom_route("/", methods=["GET"], include_in_schema=False)
+        async def root(_request):
+            return JSONResponse({
+                "service": "fincept-mcp",
+                "status": "ok",
+                "mcp_endpoint": "/mcp",
+            })
+
+        @mcp.custom_route("/health", methods=["GET"], include_in_schema=False)
+        async def health(_request):
+            return JSONResponse({"status": "ok"})
+
     # ── Tool: market_data ────────────────────────────────────────────────────
     @mcp.tool()
     def market_data(
