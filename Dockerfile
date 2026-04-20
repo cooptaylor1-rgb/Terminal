@@ -77,13 +77,14 @@ ENV QT_PREFIX="${QT_ROOT}/${QT_VERSION}/${QT_ARCH}"
 COPY --from=builder ${QT_PREFIX}/lib       ${QT_PREFIX}/lib
 COPY --from=builder ${QT_PREFIX}/plugins   ${QT_PREFIX}/plugins
 
-ENV LD_LIBRARY_PATH="${QT_PREFIX}/lib:${LD_LIBRARY_PATH}"
+ENV LD_LIBRARY_PATH="/app:${QT_PREFIX}/lib:${LD_LIBRARY_PATH}"
 ENV QT_PLUGIN_PATH="${QT_PREFIX}/plugins"
 ENV QT_QPA_PLATFORM_PLUGIN_PATH="${QT_PREFIX}/plugins/platforms"
 ENV QT_QPA_PLATFORM=xcb
 
 WORKDIR /app
 COPY --from=builder /src/build/linux-release/FinceptTerminal ./FinceptTerminal
+COPY --from=builder /src/build/linux-release/_deps/qgeoview-build/lib/libqgeoview.so ./libqgeoview.so
 COPY --from=builder /src/scripts ./scripts
 
 RUN chmod +x ./FinceptTerminal
