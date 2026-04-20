@@ -21,6 +21,7 @@ rdagent connects via:
 from __future__ import annotations
 
 import json
+import inspect
 import logging
 import os
 from datetime import datetime, timedelta
@@ -62,12 +63,21 @@ except ImportError:
 # Server definition
 # ---------------------------------------------------------------------------
 
-def build_mcp_server() -> Any:
+def build_mcp_server(host: str = "127.0.0.1", port: int = 18765) -> Any:
     """Build and return the FastMCP server instance."""
     if not MCP_SERVER_AVAILABLE:
         raise RuntimeError(
             "FastMCP not installed. Run: pip install mcp[cli] or pip install fastmcp"
         )
+
+    fastmcp_init = inspect.signature(FastMCP.__init__)
+    init_kwargs: dict[str, Any] = {}
+    if "host" in fastmcp_init.parameters:
+        init_kwargs["host"] = host
+    if "port" in fastmcp_init.parameters:
+        init_kwargs["port"] = port
+    if "streamable_http_path" in fastmcp_init.parameters:
+        init_kwargs["streamable_http_path"] = "/mcp"
 
     mcp = FastMCP(
         name="fincept-tools",
@@ -76,6 +86,7 @@ def build_mcp_server() -> Any:
             "Use market_data to get price history, financial_news for recent headlines, "
             "economics_data for macro indicators, and factor_backtest to evaluate factor expressions."
         ),
+        **init_kwargs,
     )
 
     # ── Tool: market_data ────────────────────────────────────────────────────
@@ -487,9 +498,21 @@ def main() -> None:
         print(json.dumps({"error": "mcp[cli] not installed. Run: pip install mcp[cli]"}))
         raise SystemExit(1)
 
-    server = build_mcp_server()
+    server = build_mcp_server(args.host, args.port)
     print(f"Fincept MCP server starting on http://{args.host}:{args.port}/mcp", flush=True)
-    server.run(transport="streamable-http", host=args.host, port=args.port, path="/mcp")
+
+    fastmcp_run = inspect.signature(server.run)
+    run_kwargs: dict[str, Any] = {"transport": "streamable-http"}
+    if "host" in fastmcp_run.parameters:
+        run_kwargs["host"] = args.host
+    if "port" in fastmcp_run.parameters:
+        run_kwargs["port"] = args.port
+    if "path" in fastmcp_run.parameters:
+        run_kwargs["path"] = "/mcp"
+    elif "mount_path" in fastmcp_run.parameters:
+        run_kwargs["mount_path"] = "/mcp"
+
+    server.run(**run_kwargs)
 
 
 if __name__ == "__main__":
