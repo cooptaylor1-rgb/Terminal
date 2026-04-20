@@ -223,7 +223,7 @@ set(QSIMPLE_UPDATER_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(
     QSimpleUpdater
     GIT_REPOSITORY https://github.com/alex-spataru/QSimpleUpdater.git
-    GIT_TAG        ff0cb7caae05ef381a09f212b90329ff7b7b9ab9  # master @ 2026-04-11
+    GIT_TAG        973c721c1dc7a18f87c93d7f9a8693e26f7af3a1  # master @ 2026-04-20
     GIT_SHALLOW    TRUE
 )
 FetchContent_MakeAvailable(QSimpleUpdater)
